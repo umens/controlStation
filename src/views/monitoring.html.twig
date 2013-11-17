@@ -1,0 +1,181 @@
+{% extends "layout.html.twig" %}
+{% set active_page = "monitoring" %}
+
+{% block css %}
+
+{% endblock %}
+
+{% block title %}Monitoring{% endblock %}	
+
+{% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <h1><i class="fa fa-tachometer fa-2x"></i> Dashboard</h1>
+  </div>
+</div>
+
+<div class="row">
+	<div class="col-md-6">
+    <div class="row">
+      <div class="col-md-4">
+  		  <p>Utilisation disque C:</p>
+  		  <input type="text" value="0" class="dial animated-disque">
+      </div>
+      <div class="col-md-4">
+        <p>Charge CPU</p>
+        <input type="text" value="0" class="dial animated-cpu">
+      </div>
+      <div class="col-md-4">
+        <p>Charge RAM</p>
+        <input type="text" value="0" class="dial animated-ram">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+      </div>
+      <div class="col-md-6">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <p>Upload</p>
+        <div class="chart chart-up"></div>
+      </div>
+      <div class="col-md-6">
+        <p>Download</p>
+        <div class="chart chart-down"></div>
+      </div>
+    </div>
+	</div>
+	<div id="description" class="col-md-6">
+		<p>
+			<i class="fa fa-globe"></i> <b>Hostname</b> : <span id="hostname"></span>
+    </p>
+    <p style="margin-left: 17px;">
+			<b>IP serveur</b> : <span id="ip"></span>
+    </p>  
+    <p>
+      <i class="fa fa-clock-o"></i> <b>Uptime</b> : <span id="uptime"></span>
+    </p>
+    <p>
+      <i class="fa fa-calendar-o"></i> <b>Dernier démarrage</b> : <span id="last-boot"></span>
+		</p>
+    <p>
+      <i class="fa fa-calendar-o"></i> <b>Etat des services</b> :
+    </p>
+    <div class="table-responsive" id="service">
+      
+      <table class="table table-striped table-hover">
+
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>Etat</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+	</div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+$( document ).ready(function() {
+
+	$.ajax({
+    type: "get",
+    dataType: 'jsonp',
+		url: "http://www.pegase.fr/phpsysinfo/xml.php?plugin=complete&jsonp",
+    //url: "http://phpsysinfo.sourceforge.net/phpsysinfo/xml.php?plugin=complete&jsonp",
+    timeout: 5000,
+    beforeSend: function( xhr ) {
+      //Affichage du loader pendant la durée de l'appel Ajax
+      $('#loading').show();
+      $('#loading').spin(opts);
+    }
+	})
+	.done(function(data) {
+
+		$('#hostname').html(data.Vitals["@attributes"].Hostname);
+		$('#ip').html(data.Vitals["@attributes"].IPAddr);
+    $('#upload').html(data.Network[0]["@attributes"].TxBytes);
+    $('#download').html(data.Network[0]["@attributes"].RxBytes);
+    $('#service tbody').append(create_html_service(data.Plugins.Plugin_PSStatus.Process[0]["@attributes"].Name, data.Plugins.Plugin_PSStatus.Process[0]["@attributes"].Status));
+    $('#service tbody').append(create_html_service(data.Plugins.Plugin_PSStatus.Process[1]["@attributes"].Name, data.Plugins.Plugin_PSStatus.Process[1]["@attributes"].Status));
+    $('#service tbody').append(create_html_service(data.Plugins.Plugin_PSStatus.Process[2]["@attributes"].Name, data.Plugins.Plugin_PSStatus.Process[2]["@attributes"].Status));
+
+    //affichage lisible de l'uptime
+    var uptime = new Date();
+    var text = '', chiffre = '';
+    uptime.setTime(uptime.getTime() - (data.Vitals["@attributes"].Uptime * 1000));
+    text = uptime.toGMTString();
+    var heures = parseInt(parseInt(data.Vitals["@attributes"].Uptime) / 3600);
+    var minutes = parseInt((parseInt(data.Vitals["@attributes"].Uptime) / 60) % 60);
+    var secondes = parseInt(parseInt(data.Vitals["@attributes"].Uptime) % 60);
+    chiffre = heures + ((heures > 1) ? " heures " : " heure ") + minutes + ((minutes > 1) ? " minutes" : " minute") + " et " + secondes + ((secondes > 1) ? " secondes." : " seconde.");
+    $('#uptime').html(chiffre);
+    $('#last-boot').html(text);
+
+    //disparition du loader
+    $('#loading').hide();
+    $('#loading').spin(false);
+
+    //animation de la jauge HDD
+    $({value: 0}).animate({value: data.FileSystem.Mount[0]["@attributes"].Percent}, {
+      duration: 1000,
+      easing:'swing',
+      step: function() 
+      {
+          $('.animated-disque').val(Math.ceil(this.value)).trigger('change');
+      }
+    })
+
+    $({value: 0}).animate({value: data.Vitals["@attributes"].CPULoad}, {
+      duration: 1000,
+      easing:'swing',
+      step: function() 
+      {
+          $('.animated-cpu').val(Math.ceil(this.value)).trigger('change');
+      }
+    })
+
+    $({value: 0}).animate({value: data.Memory["@attributes"].Percent}, {
+      duration: 1000,
+      easing:'swing',
+      step: function() 
+      {
+          $('.animated-ram').val(Math.ceil(this.value)).trigger('change');
+      }
+    })
+
+ 	})
+	.fail(function() {
+      $("#container-primary").html('<div class="alert alert-danger alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><i class="fa fa-exclamation-triangle"></i> <strong>Erreur !</strong> Il y a eu un problème lors de la récupération des données serveur.</div>');  
+	   	//alert( "Request failed: " + textStatus );
+      $('#loading').hide();
+      $('#loading').spin(false);
+	});
+
+	$(".dial").knob({
+  	'min': 0,
+  	'max': 100,
+    'width': 150,
+  	'readOnly': true,
+  	//'angleArc': 180,
+    'angleArc': 250,
+  	//'angleOffset' : -90
+    'angleOffset' : -125
+  });
+  	
+});
+</script>
+{% endblock %}
