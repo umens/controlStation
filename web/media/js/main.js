@@ -38,10 +38,10 @@ function create_html_service(service, etat){
     var html = '<tr><td>'+service+'</td><td>';
 
     if(etat == 1){
-        html = html+'<span class="label label-success"><i class="fa fa-play"></i> En service</span></td><td><div class="btn-group"><button type="button" class="btn btn-xs btn-success active" disabled="disabled">On</button><button type="button" class="btn btn-xs btn-danger">Off</button></div></td>';
+        html = html+'<span class="label label-success"><i class="fa fa-play"></i> En service</span></td><td><div class="btn-group bt-switch"><button type="button" class="btn btn-xs btn-success active" disabled="disabled">On</button><button type="button" class="btn btn-xs btn-danger bt-switch-active-right bt-switch-action-off">Off</button></div></td>';
     }
     else{
-        html = html+'<span class="label label-danger"><i class="fa fa-stop"></i> Arreté</span></td><td><div class="btn-group"><button type="button" class="btn btn-xs btn-success">On</button><button type="button" class="btn btn-xs btn-danger active" disabled="disabled">Off</button></div></td>';
+        html = html+'<span class="label label-danger"><i class="fa fa-stop"></i> Arreté</span></td><td><div class="btn-group bt-switch"><button type="button" class="btn btn-xs btn-success bt-switch-active-left bt-switch-action-on">On</button><button type="button" class="btn btn-xs btn-danger active" disabled="disabled">Off</button></div></td>';
     }
 
     return html;

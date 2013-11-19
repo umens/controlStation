@@ -82,6 +82,25 @@ code {
   margin-left: 17px;
 }
 
+.bt-switch{
+  border: 2px groove rgb(206, 206, 206);
+}
+
+.bt-switch-active-right{
+  border: 1px solid rgb(99, 99, 99);
+  -moz-box-shadow: -2px 0px 1px 0px #4D4D4D;
+  -webkit-box-shadow: -2px 0px 1px 0px #4D4D4D;
+  -o-box-shadow: -2px 0px 1px 0px #4D4D4D;
+  box-shadow: -2px 0px 1px 0px #4D4D4D;
+}
+
+.bt-switch-active-left{
+  border: 1px solid rgb(99, 99, 99);
+  -moz-box-shadow: 2px 0px 1px 0px #4D4D4D;
+  -webkit-box-shadow: 2px 0px 1px 0px #4D4D4D;
+  -o-box-shadow: 2px 0px 1px 0px #4D4D4D;
+  box-shadow: 2px 0px 1px 0px #4D4D4D;
+}
 
 
 

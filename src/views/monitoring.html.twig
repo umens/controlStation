@@ -175,6 +175,31 @@ $( document ).ready(function() {
   	//'angleOffset' : -90
     'angleOffset' : -125
   });
+
+  $("#service").on( "click", '.bt-switch-action-off', function( event ) {
+    event.preventDefault();
+    $(this).attr('disabled', 'disabled');
+    $(this).addClass('active');
+    $(this).removeClass('bt-switch-active-right');
+    $(this).removeClass('bt-switch-action-off');
+    $(this).prev("button").addClass('bt-switch-active-left');
+    $(this).prev("button").addClass('bt-switch-action-on');
+    $(this).prev("button").removeClass('active');
+    $(this).prev("button").removeAttr('disabled');
+  });
+
+  $("#service").on( "click", '.bt-switch-action-on', function( event ) {
+    event.preventDefault();
+    event.preventDefault();
+    $(this).attr('disabled', 'disabled');
+    $(this).addClass('active');
+    $(this).removeClass('bt-switch-active-left');
+    $(this).removeClass('bt-switch-action-on');
+    $(this).next("button").addClass('bt-switch-active-right');
+    $(this).next("button").addClass('bt-switch-action-off');
+    $(this).next("button").removeClass('active');
+    $(this).next("button").removeAttr('disabled');
+  });    
   	
 });
 </script>
